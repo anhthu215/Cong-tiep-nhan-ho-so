@@ -28,21 +28,36 @@ export function ChatWidget() {
   const [loading, setLoading] = React.useState(false);
   const endRef = React.useRef<HTMLDivElement>(null);
 
+  // Nạp lịch sử từ database (server đọc theo cookie phiên), không lưu gì ở bộ nhớ trình duyệt.
+  React.useEffect(() => {
+    let cancelled = false;
+    fetch("/api/chat")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.messages?.length) {
+          setMessages([...initialMessages, ...data.messages]);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   React.useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end" });
   }, [messages, loading, open]);
 
   async function sendMessage(text: string) {
     if (!text.trim() || loading) return;
-    const next: Message[] = [...messages, { from: "user", text }];
-    setMessages(next);
+    setMessages((prev) => [...prev, { from: "user", text }]);
     setInput("");
     setLoading(true);
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: next }),
+        body: JSON.stringify({ message: text }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
