@@ -12,12 +12,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { countries, type School } from "@/lib/mock-data";
+import type { School } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 export function SchoolList({ schools }: { schools: School[] }) {
   const [country, setCountry] = React.useState<string>("all");
   const [query, setQuery] = React.useState("");
+  const countries = React.useMemo(
+    () => [...new Set(schools.map((s) => s.country))].sort((a, b) => a.localeCompare(b, "vi")),
+    [schools],
+  );
 
   const filtered = schools.filter(
     (s) =>

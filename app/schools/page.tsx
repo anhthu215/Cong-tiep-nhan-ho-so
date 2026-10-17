@@ -1,13 +1,17 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { SchoolList } from "@/components/schools/school-list";
 import { Button } from "@/components/ui/button";
-import { schools } from "@/lib/mock-data";
+import { getSchools } from "@/lib/schools";
 
 export const metadata = { title: "Điểm chuẩn các trường | DuHoc24" };
 
-export default function SchoolsPage() {
+export default async function SchoolsPage() {
+  await connection();
+  const schools = await getSchools();
+
   return (
     <>
       <SiteHeader />
