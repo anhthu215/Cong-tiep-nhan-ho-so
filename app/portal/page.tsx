@@ -4,7 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DocumentFeatures } from "@/components/portal/document-features";
 import { ExtractedInfo } from "@/components/portal/extracted-info";
 import { SchoolMatch } from "@/components/portal/school-match";
-import { matchSchools } from "@/lib/school-match";
+import { ScholarshipSuggestions } from "@/components/portal/scholarship-suggestions";
+import { evaluatePortal } from "@/lib/portal-readiness";
+import { inputHash } from "@/lib/scholarship-advisor";
+import { getCachedSuggestion } from "@/lib/scholarship-suggestions";
 import { getSchools } from "@/lib/schools";
 import { getStudentDocuments } from "@/lib/student-documents";
 import type { DocStatus } from "@/lib/mock-data";
@@ -18,19 +21,12 @@ export default async function PortalPage() {
   const statusOf = (d?: { status: DocStatus }): DocStatus => d?.status ?? "chua_nop";
 
   // Chỉ cần bảng điểm và IELTS hợp lệ là đối chiếu được (CMND/hộ chiếu không bắt buộc).
-  // Điểm học tập phải ở thang 10 mới so được với điểm chuẩn.
-  const missing = [
-    ["Bảng điểm", transcript],
-    ["Chứng chỉ IELTS", ielts],
-  ]
-    .filter(([, d]) => (d as { status?: string } | undefined)?.status !== "hop_le")
-    .map(([label]) => label as string);
-
-  const gpa = transcript?.gpa ?? null;
-  const ieltsOverall = ielts?.ielts_overall ?? null;
-  const scaleOk = transcript?.gpa_scale === 10;
-  const ready = missing.length === 0 && gpa !== null && ieltsOverall !== null && scaleOk;
-  const matches = ready ? matchSchools({ gpa, ielts: ieltsOverall }, schools) : [];
+  const { ready, missing, gpa, ielts: ieltsOverall, matches } = evaluatePortal(documents, schools);
+  const passedSchools = matches.filter((m) => m.passed).map((m) => m.school.name);
+  const cachedSuggestion =
+    ready && passedSchools.length > 0
+      ? await getCachedSuggestion(inputHash({ gpa: gpa!, ielts: ieltsOverall!, passedSchools }))
+      : null;
 
   return (
     <>
@@ -85,7 +81,24 @@ export default async function PortalPage() {
         <section className="mt-12 space-y-6">
           <ExtractedInfo documents={documents} />
           {ready ? (
-            <SchoolMatch matches={matches} student={{ gpa: gpa!, ielts: ieltsOverall! }} />
+            <>
+              <SchoolMatch matches={matches} student={{ gpa: gpa!, ielts: ieltsOverall! }} />
+              {passedSchools.length > 0 ? (
+                <ScholarshipSuggestions
+                  suggestion={cachedSuggestion?.suggestion ?? null}
+                  schoolsLookedUp={cachedSuggestion?.schoolsLookedUp ?? []}
+                />
+              ) : (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Gợi ý học bổng</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-sm text-muted-foreground">
+                    Bạn chưa đạt điểm chuẩn trường nào trong danh sách nên chưa có gợi ý học bổng.
+                  </CardContent>
+                </Card>
+              )}
+            </>
           ) : (
             <Card>
               <CardHeader>
