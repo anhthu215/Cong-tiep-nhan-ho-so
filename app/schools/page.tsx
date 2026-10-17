@@ -28,7 +28,7 @@ export default async function SchoolsPage() {
 
         <div className="mt-10 flex flex-wrap items-center justify-between gap-4 rounded-2xl border bg-muted/40 p-6">
           <p className="text-sm text-muted-foreground">Muốn biết mình đủ điều kiện vào trường nào?</p>
-          <Button render={<Link href="/#bao-gia" />}>Nhận báo giá</Button>
+          <Button nativeButton={false} render={<Link href="/#bao-gia">Nhận báo giá</Link>} />
         </div>
       </main>
       <SiteFooter />
