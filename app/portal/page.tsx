@@ -17,11 +17,11 @@ export default async function PortalPage() {
   const name = id_document?.full_name ?? transcript?.full_name ?? ielts?.full_name ?? null;
   const statusOf = (d?: { status: DocStatus }): DocStatus => d?.status ?? "chua_nop";
 
-  // Chỉ đối chiếu khi hồ sơ đầy đủ (đủ 3 giấy tờ) và hợp lệ. Điểm học tập phải ở thang 10 mới so được với điểm chuẩn.
+  // Chỉ cần bảng điểm và IELTS hợp lệ là đối chiếu được (CMND/hộ chiếu không bắt buộc).
+  // Điểm học tập phải ở thang 10 mới so được với điểm chuẩn.
   const missing = [
     ["Bảng điểm", transcript],
     ["Chứng chỉ IELTS", ielts],
-    ["CMND/CCCD hoặc hộ chiếu", id_document],
   ]
     .filter(([, d]) => (d as { status?: string } | undefined)?.status !== "hop_le")
     .map(([label]) => label as string);
@@ -44,7 +44,7 @@ export default async function PortalPage() {
         <section className="mt-10">
           <h2 className="text-lg font-medium">Giấy tờ cần nộp</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Nộp đủ 3 loại giấy tờ dưới đây, hệ thống sẽ tự trích xuất thông tin và đối chiếu điểm chuẩn giúp bạn.
+            Chỉ cần nộp bảng điểm và chứng chỉ IELTS là hệ thống tự trích xuất thông tin và đối chiếu điểm chuẩn giúp bạn. CMND/CCCD hoặc hộ chiếu không bắt buộc.
           </p>
 
           <div className="mt-6">
@@ -70,7 +70,7 @@ export default async function PortalPage() {
                 },
                 {
                   docType: "id_document",
-                  title: "Ảnh CMND/CCCD hoặc hộ chiếu",
+                  title: "Ảnh CMND/CCCD hoặc hộ chiếu (không bắt buộc)",
                   accept: "Chấp nhận JPG, PNG, tối đa 4MB",
                   mimeAccept: "image/jpeg,image/png,image/webp",
                   fileName: id_document?.file_name,
@@ -93,7 +93,7 @@ export default async function PortalPage() {
               </CardHeader>
               <CardContent className="text-sm text-muted-foreground">
                 {missing.length > 0
-                  ? `Hồ sơ cần đầy đủ và hợp lệ để đối chiếu điểm chuẩn. Còn thiếu hoặc cần nộp lại: ${missing.join(", ")}.`
+                  ? `Cần nộp hợp lệ bảng điểm và chứng chỉ IELTS để đối chiếu điểm chuẩn. Còn thiếu hoặc cần nộp lại: ${missing.join(", ")}.`
                   : "Bảng điểm của bạn không ở thang điểm 10 nên hệ thống chưa tự đối chiếu được. Đội ngũ tư vấn sẽ hỗ trợ bạn."}
               </CardContent>
             </Card>
