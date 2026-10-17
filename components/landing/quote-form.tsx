@@ -62,7 +62,7 @@ export function QuoteForm() {
             Nhận báo giá dịch vụ ngay
           </h2>
           <p className="mt-3 max-w-lg text-muted-foreground">
-            Chọn quốc gia, bậc học và gói dịch vụ theo mẫu ở dưới
+            Chọn quốc gia, bậc học và gói dịch vụ phù hợp với bạn
           </p>
         </div>
 

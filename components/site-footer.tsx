@@ -24,11 +24,11 @@ export function SiteFooter() {
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="size-4 shrink-0" />
-                <span>1900 636 999</span>
+                <span>0912 345 6789</span>
               </li>
               <li className="flex items-center gap-2">
                 <MapPin className="size-4 shrink-0" />
-                <span>Quận 1, TP. Hồ Chí Minh</span>
+                <span>Số 1 Hai Bà Trưng, Hà Nội</span>
               </li>
             </ul>
           </div>
@@ -42,7 +42,7 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-muted-foreground duration-150 hover:text-primary">
+                <Link href="/schools" className="text-muted-foreground duration-150 hover:text-primary">
                   Điểm chuẩn các trường
                 </Link>
               </li>
@@ -57,7 +57,7 @@ export function SiteFooter() {
 
         <div className="border-t pt-6">
           <p className="text-sm text-muted-foreground">
-            &copy; 2026 DuHoc24. Website mẫu dùng cho mục đích đào tạo.
+            &copy; 2026 DuHoc24. Bảo lưu mọi quyền.
           </p>
         </div>
       </div>

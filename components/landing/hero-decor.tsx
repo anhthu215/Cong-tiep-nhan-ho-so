@@ -3,22 +3,21 @@ export function HeroDecor() {
   return (
     <svg
       aria-hidden="true"
-      viewBox="0 0 520 420"
-      preserveAspectRatio="xMaxYMid meet"
-      className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[52%] max-w-[760px] md:block"
+      viewBox="0 0 520 380"
+      className="pointer-events-none hidden w-full max-w-[560px] justify-self-end md:block"
     >
-      <g className="fill-white/70">
-        <rect x="150" y="34" width="190" height="16" rx="8" />
-        <rect x="200" y="58" width="130" height="14" rx="7" />
-        <rect x="300" y="356" width="200" height="16" rx="8" />
-        <rect x="350" y="380" width="130" height="14" rx="7" />
+      <g className="fill-white/80">
+        <rect x="250" y="14" width="200" height="16" rx="8" />
+        <rect x="300" y="38" width="130" height="14" rx="7" />
+        <rect x="330" y="340" width="180" height="16" rx="8" />
+        <rect x="380" y="362" width="120" height="14" rx="7" />
       </g>
       <g className="fill-primary/10">
-        <rect x="10" y="330" width="200" height="16" rx="8" />
-        <rect x="64" y="354" width="150" height="14" rx="7" />
+        <rect x="0" y="338" width="210" height="14" rx="7" />
+        <rect x="50" y="358" width="150" height="12" rx="6" />
       </g>
       <g
-        transform="translate(150 78) scale(1.15)"
+        transform="translate(50 50) scale(1.35)"
         fill="none"
         strokeWidth="2"
         strokeLinecap="round"
