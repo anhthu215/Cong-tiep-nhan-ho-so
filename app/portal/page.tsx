@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DocumentFeatures } from "@/components/portal/document-features";
 import { ExtractedInfo } from "@/components/portal/extracted-info";
 import { SchoolMatch } from "@/components/portal/school-match";
+import { matchSchools } from "@/lib/school-match";
 import { getSchools } from "@/lib/schools";
 import { getStudentDocuments } from "@/lib/student-documents";
 import type { DocStatus } from "@/lib/mock-data";
@@ -16,16 +17,20 @@ export default async function PortalPage() {
   const name = id_document?.full_name ?? transcript?.full_name ?? ielts?.full_name ?? null;
   const statusOf = (d?: { status: DocStatus }): DocStatus => d?.status ?? "chua_nop";
 
-  // Chỉ so sánh khi có điểm hệ 10 và IELTS tổng; hệ điểm khác chưa quy đổi.
-  const gpa10 = transcript?.status === "hop_le" && transcript.gpa_scale === 10 ? transcript.gpa : null;
-  const ieltsOverall = ielts?.status === "hop_le" ? ielts.ielts_overall : null;
-  const canMatch = gpa10 !== null && ieltsOverall !== null;
-  const matches = canMatch
-    ? schools.map((school) => ({
-        school,
-        passed: gpa10 >= school.minGpa && ieltsOverall >= school.minIelts,
-      }))
-    : [];
+  // Chỉ đối chiếu khi hồ sơ đầy đủ (đủ 3 giấy tờ) và hợp lệ. Điểm học tập phải ở thang 10 mới so được với điểm chuẩn.
+  const missing = [
+    ["Bảng điểm", transcript],
+    ["Chứng chỉ IELTS", ielts],
+    ["CMND/CCCD hoặc hộ chiếu", id_document],
+  ]
+    .filter(([, d]) => (d as { status?: string } | undefined)?.status !== "hop_le")
+    .map(([label]) => label as string);
+
+  const gpa = transcript?.gpa ?? null;
+  const ieltsOverall = ielts?.ielts_overall ?? null;
+  const scaleOk = transcript?.gpa_scale === 10;
+  const ready = missing.length === 0 && gpa !== null && ieltsOverall !== null && scaleOk;
+  const matches = ready ? matchSchools({ gpa, ielts: ieltsOverall }, schools) : [];
 
   return (
     <>
@@ -79,17 +84,17 @@ export default async function PortalPage() {
 
         <section className="mt-12 space-y-6">
           <ExtractedInfo documents={documents} />
-          {canMatch ? (
-            <SchoolMatch matches={matches} />
+          {ready ? (
+            <SchoolMatch matches={matches} student={{ gpa: gpa!, ielts: ieltsOverall! }} />
           ) : (
             <Card>
               <CardHeader>
                 <CardTitle>Đối chiếu điểm chuẩn</CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-muted-foreground">
-                {transcript?.status === "hop_le" && transcript.gpa_scale !== 10
-                  ? "Bảng điểm của bạn không ở thang điểm 10 nên hệ thống chưa tự đối chiếu được. Đội ngũ tư vấn sẽ hỗ trợ bạn."
-                  : "Nộp hợp lệ bảng điểm (thang điểm 10) và chứng chỉ IELTS để xem bạn đủ điều kiện vào trường nào."}
+                {missing.length > 0
+                  ? `Hồ sơ cần đầy đủ và hợp lệ để đối chiếu điểm chuẩn. Còn thiếu hoặc cần nộp lại: ${missing.join(", ")}.`
+                  : "Bảng điểm của bạn không ở thang điểm 10 nên hệ thống chưa tự đối chiếu được. Đội ngũ tư vấn sẽ hỗ trợ bạn."}
               </CardContent>
             </Card>
           )}

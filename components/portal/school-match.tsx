@@ -1,19 +1,36 @@
 import { Check, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import type { School } from "@/lib/mock-data";
+import type { SchoolMatchResult } from "@/lib/school-match";
 
-export function SchoolMatch({ matches }: { matches: { school: School; passed: boolean }[] }) {
+function Criterion({ label, mine, required, ok }: { label: string; mine: number; required: number; ok: boolean }) {
+  return (
+    <p className={cn(ok ? "text-green-700" : "text-red-600")}>
+      {label}: {mine.toFixed(1)} {ok ? "≥" : "<"} {required.toFixed(1)}
+    </p>
+  );
+}
+
+export function SchoolMatch({
+  matches,
+  student,
+}: {
+  matches: SchoolMatchResult[];
+  student: { gpa: number; ielts: number };
+}) {
+  const passedCount = matches.filter((m) => m.passed).length;
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Đối chiếu điểm chuẩn</CardTitle>
         <p className="text-sm text-muted-foreground">
-          So sánh điểm học tập và IELTS của bạn với điểm chuẩn từng trường.
+          Điểm học tập {student.gpa.toFixed(1)}/10 và IELTS {student.ielts.toFixed(1)} của bạn so với điểm chuẩn từng
+          trường. Bạn đạt <span className="font-medium text-foreground">{passedCount}/{matches.length}</span> trường.
         </p>
       </CardHeader>
       <CardContent className="space-y-3">
-        {matches.map(({ school, passed }) => (
+        {matches.map(({ school, gpaOk, ieltsOk, passed }) => (
           <div
             key={school.id}
             className={cn(
@@ -32,12 +49,14 @@ export function SchoolMatch({ matches }: { matches: { school: School; passed: bo
               </span>
               <div>
                 <p className="font-medium">{school.name}</p>
-                <p className="text-sm text-muted-foreground">{school.country}</p>
+                <p className="text-sm text-muted-foreground">
+                  {school.country} · {passed ? "Đạt" : "Chưa đạt"}
+                </p>
               </div>
             </div>
-            <div className="text-right text-sm text-muted-foreground">
-              <p>Yêu cầu GPA ≥ {school.minGpa.toFixed(1)}</p>
-              <p>IELTS ≥ {school.minIelts.toFixed(1)}</p>
+            <div className="text-right text-sm">
+              <Criterion label="GPA" mine={student.gpa} required={school.minGpa} ok={gpaOk} />
+              <Criterion label="IELTS" mine={student.ielts} required={school.minIelts} ok={ieltsOk} />
             </div>
           </div>
         ))}
