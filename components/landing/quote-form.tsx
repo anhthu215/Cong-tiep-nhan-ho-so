@@ -58,7 +58,7 @@ export function QuoteForm() {
     <section id="bao-gia" className="scroll-mt-24 py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-6">
         <div>
-          <h2 className="text-balance text-3xl font-medium tracking-tight md:text-4xl">
+          <h2 className="text-balance text-3xl font-medium tracking-tight">
             Nhận báo giá dịch vụ ngay
           </h2>
           <p className="mt-3 max-w-lg text-muted-foreground">
@@ -96,7 +96,7 @@ export function QuoteForm() {
                     <label
                       key={level.value}
                       className={cn(
-                        "flex cursor-pointer items-center justify-center gap-2 rounded-lg border px-2 py-2 text-sm duration-150",
+                        "flex h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border px-2 text-[15px] duration-150",
                         degreeLevel === level.value
                           ? "border-primary bg-accent text-accent-foreground"
                           : "border-input text-muted-foreground hover:bg-muted/50",

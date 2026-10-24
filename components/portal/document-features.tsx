@@ -95,10 +95,10 @@ function UploadCard({ item }: { item: DocumentFeature }) {
           variant="outline"
           size="sm"
           className="mt-3"
-          disabled={busy}
+          loading={busy}
           onClick={() => inputRef.current?.click()}
         >
-          <Upload className="size-4" />
+          {!busy && <Upload className="size-4" />}
           {item.status === "chua_nop" ? "Tải lên" : "Tải lên lại"}
         </Button>
       </div>

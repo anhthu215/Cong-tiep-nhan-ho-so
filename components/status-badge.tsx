@@ -7,14 +7,14 @@ type Tone = "gray" | "yellow" | "green" | "red";
 const toneClasses: Record<Tone, string> = {
   gray: "bg-gray-100 text-gray-600 ring-gray-200",
   yellow: "bg-yellow-100 text-yellow-700 ring-yellow-200",
-  green: "bg-green-100 text-green-700 ring-green-200",
+  green: "bg-success-soft text-success-ink ring-success-border",
   red: "bg-red-100 text-red-700 ring-red-200",
 };
 
 const dotToneClasses: Record<Tone, string> = {
   gray: "bg-gray-400",
   yellow: "bg-yellow-500",
-  green: "bg-green-500",
+  green: "bg-success",
   red: "bg-red-500",
 };
 

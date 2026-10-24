@@ -32,7 +32,7 @@ export function SiteHeader() {
   return (
     <header
       className={cn(
-        "fixed top-0 z-40 w-full border-b bg-background/90 backdrop-blur supports-backdrop-filter:bg-background/75 duration-200",
+        "fixed top-0 z-40 w-full border-b bg-card/95 backdrop-blur supports-backdrop-filter:bg-card/85 duration-200",
         scrolled && "shadow-md shadow-primary/5",
       )}
     >

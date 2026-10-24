@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Loader2, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { extractLeadAction } from "@/app/admin/conversations/actions";
 
@@ -12,7 +12,7 @@ export function ExtractLeadButton({ conversationId, hasLead }: { conversationId:
   return (
     <div className="flex flex-col items-end gap-1">
       <Button
-        disabled={pending}
+        loading={pending}
         onClick={() =>
           startTransition(async () => {
             setError(null);
@@ -21,7 +21,7 @@ export function ExtractLeadButton({ conversationId, hasLead }: { conversationId:
           })
         }
       >
-        {pending ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
+        {!pending && <Sparkles className="size-4" />}
         {hasLead ? "Trích xuất lại" : "Trích xuất lead"}
       </Button>
       {error && <p className="text-xs text-destructive">{error}</p>}

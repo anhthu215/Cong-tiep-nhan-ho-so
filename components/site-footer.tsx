@@ -4,7 +4,7 @@ import { Logo } from "@/components/logo";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t bg-muted/30">
+    <footer className="border-t bg-card">
       <div className="mx-auto max-w-7xl space-y-10 px-6 py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="col-span-full lg:col-span-2">

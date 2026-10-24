@@ -34,11 +34,11 @@ export default async function PortalPage() {
       <main className="mx-auto max-w-5xl px-6 pb-24 pt-32">
         <div className="border-b pb-6">
           <p className="text-sm text-muted-foreground">Xin chào,</p>
-          <h1 className="text-2xl font-medium tracking-tight">{name ?? "bạn"}</h1>
+          <h1 className="text-3xl font-medium tracking-tight">{name ?? "bạn"}</h1>
         </div>
 
         <section className="mt-10">
-          <h2 className="text-lg font-medium">Giấy tờ cần nộp</h2>
+          <h2 className="text-xl font-medium">Giấy tờ cần nộp</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Chỉ cần nộp bảng điểm và chứng chỉ IELTS là hệ thống tự trích xuất thông tin và đối chiếu điểm chuẩn giúp bạn. CMND/CCCD hoặc hộ chiếu không bắt buộc.
           </p>

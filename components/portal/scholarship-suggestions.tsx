@@ -63,8 +63,8 @@ export function ScholarshipSuggestions({
         ) : error ? (
           <div className="flex flex-wrap items-center gap-3">
             <p className="text-sm text-red-600">{error}</p>
-            <Button variant="outline" size="sm" onClick={generate} disabled={loading}>
-              <RotateCw className="size-4" />
+            <Button variant="outline" size="sm" onClick={generate} loading={loading}>
+              {!loading && <RotateCw className="size-4" />}
               Thử lại
             </Button>
           </div>

@@ -29,7 +29,7 @@ export function Process() {
           <span className="h-px w-5 bg-primary" />
           Quy trình
         </p>
-        <h2 className="mt-3 max-w-xl text-balance text-3xl font-medium tracking-tight md:text-4xl">
+        <h2 className="mt-3 max-w-xl text-balance text-3xl font-medium tracking-tight">
           Ba bước từ báo giá đến kết quả
         </h2>
 

@@ -10,7 +10,7 @@ export function Faq() {
           <span className="h-px w-5 bg-primary" />
           Câu hỏi thường gặp
         </p>
-        <h2 className="mt-3 text-balance text-3xl font-medium tracking-tight md:text-4xl">
+        <h2 className="mt-3 text-balance text-3xl font-medium tracking-tight">
           Bạn cần biết gì trước khi bắt đầu
         </h2>
 

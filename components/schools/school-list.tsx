@@ -38,7 +38,7 @@ export function SchoolList({ schools }: { schools: School[] }) {
               key={c}
               onClick={() => setCountry(c)}
               className={cn(
-                "rounded-full border px-3 py-1 text-sm duration-150",
+                "h-9 rounded-full border px-4 text-sm duration-150",
                 country === c
                   ? "border-primary bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:border-primary hover:text-primary",
@@ -48,14 +48,14 @@ export function SchoolList({ schools }: { schools: School[] }) {
             </button>
           ))}
         </div>
-        <div className="relative w-full sm:w-64">
+        <div className="relative w-full sm:w-72">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Tìm tên trường..."
             aria-label="Tìm tên trường"
-            className="h-9 w-full rounded-full border border-input bg-transparent pl-9 pr-3.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            className="h-11 w-full rounded-lg border border-input bg-card pl-10 pr-3.5 text-[15px] outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
           />
         </div>
       </div>

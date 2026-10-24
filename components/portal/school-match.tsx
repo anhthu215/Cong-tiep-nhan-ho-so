@@ -5,7 +5,7 @@ import type { SchoolMatchResult } from "@/lib/school-match";
 
 function Criterion({ label, mine, required, ok }: { label: string; mine: number; required: number; ok: boolean }) {
   return (
-    <p className={cn(ok ? "text-green-700" : "text-red-600")}>
+    <p className={cn(ok ? "text-success-ink" : "text-red-600")}>
       {label}: {mine.toFixed(1)} {ok ? "≥" : "<"} {required.toFixed(1)}
     </p>
   );
@@ -35,14 +35,14 @@ export function SchoolMatch({
             key={school.id}
             className={cn(
               "flex items-center justify-between gap-4 rounded-xl border p-4",
-              passed ? "border-green-200 bg-green-50" : "border-border bg-muted/30",
+              passed ? "border-success-border bg-success-soft" : "border-border bg-card",
             )}
           >
             <div className="flex items-center gap-3">
               <span
                 className={cn(
                   "flex size-8 shrink-0 items-center justify-center rounded-full",
-                  passed ? "bg-green-500 text-white" : "bg-gray-200 text-gray-500",
+                  passed ? "bg-success text-white" : "bg-muted text-muted-foreground",
                 )}
               >
                 {passed ? <Check className="size-4" /> : <X className="size-4" />}

@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { HeroDecor } from "@/components/landing/hero-decor";
+import { HeroPhoto } from "@/components/landing/hero-photo";
 
 export function Hero() {
   return (
-    <section className="overflow-hidden border-b bg-hero-sky pb-16 pt-32 md:pb-20 md:pt-36">
-      <div className="mx-auto grid max-w-7xl items-center gap-8 px-6 md:grid-cols-2">
+    <section className="overflow-hidden border-b bg-hero-sky pb-20 pt-32 md:pb-24 md:pt-36">
+      <div className="mx-auto grid max-w-7xl items-center gap-10 px-6 md:grid-cols-2">
         <div>
           <p className="flex items-center gap-2 text-sm font-medium text-primary">
             <span className="h-px w-5 bg-primary" />
@@ -37,7 +37,7 @@ export function Hero() {
           </div>
         </div>
 
-        <HeroDecor />
+        <HeroPhoto />
       </div>
     </section>
   );
