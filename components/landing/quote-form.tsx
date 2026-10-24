@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { emailErrorMessage } from "@/lib/validation";
 import { countries, servicePackages, type ServicePackage } from "@/lib/mock-data";
 
 const degreeLevels = [
@@ -45,17 +46,29 @@ export function QuoteForm() {
   const [selectedPackage, setSelectedPackage] = React.useState<ServicePackage>("co_ban");
   const [customerName, setCustomerName] = React.useState("");
   const [email, setEmail] = React.useState("");
+  const [emailTouched, setEmailTouched] = React.useState(false);
   const [phone, setPhone] = React.useState("");
   const [website, setWebsite] = React.useState(""); // ô ẩn chống bot
   const [quotedPrice, setQuotedPrice] = React.useState<number | null>(null);
   const [sending, setSending] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
+  // Kiểm tra email ngay khi nhập: báo lỗi khi đã gõ "@" hoặc khoảng trắng, khi rời ô, hoặc khi bấm gửi;
+  // từ lúc đó mỗi ký tự gõ thêm đều được kiểm tra lại.
+  const emailError = emailErrorMessage(email);
+  const showEmailError =
+    emailError !== null && (emailTouched || (email.trim() !== "" && /[@\s]/.test(email)));
+
   const chosenPackage = servicePackages.find((p) => p.id === selectedPackage)!;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setEmailTouched(true);
+    if (emailError) {
+      document.getElementById("email")?.focus();
+      return;
+    }
     if (!country) {
       setError("Vui lòng chọn quốc gia muốn du học.");
       return;
@@ -199,12 +212,22 @@ export function QuoteForm() {
                 <Label htmlFor="email">Email liên hệ</Label>
                 <Input
                   id="email"
-                  type="email"
+                  type="text"
+                  inputMode="email"
+                  autoComplete="email"
                   required
                   placeholder="ban@email.com"
                   value={email}
+                  aria-invalid={showEmailError || undefined}
+                  aria-describedby={showEmailError ? "email-error" : undefined}
                   onChange={(e) => setEmail(e.target.value)}
+                  onBlur={() => email && setEmailTouched(true)}
                 />
+                {showEmailError && (
+                  <p id="email-error" role="alert" className="text-sm text-red-600">
+                    {emailError}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Số điện thoại</Label>

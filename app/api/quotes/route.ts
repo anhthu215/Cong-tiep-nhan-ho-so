@@ -1,5 +1,8 @@
+import { after } from "next/server";
+import { sendQuoteToMake } from "@/lib/make-webhook";
 import { countries, servicePackages } from "@/lib/mock-data";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isValidEmail } from "@/lib/validation";
 
 const DEGREE_LEVELS = ["thpt", "dai_hoc", "thac_si"];
 const MAX_REQUESTS_PER_EMAIL_PER_DAY = 3;
@@ -27,13 +30,14 @@ export async function POST(request: Request) {
   const pkg = servicePackages.find((p) => p.id === body.servicePackage);
 
   if (customerName.length < 2) return fail("Vui lòng nhập họ tên.", 400);
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail("Email chưa hợp lệ.", 400);
+  if (!isValidEmail(email)) return fail("Email chưa hợp lệ.", 400);
   if (phone && !/^[0-9+()\-.\s]{6,30}$/.test(phone)) return fail("Số điện thoại chưa hợp lệ.", 400);
   if (!(countries as readonly string[]).includes(country)) return fail("Vui lòng chọn quốc gia.", 400);
   if (!DEGREE_LEVELS.includes(degreeLevel)) return fail("Bậc học không hợp lệ.", 400);
   if (!pkg) return fail("Gói dịch vụ không hợp lệ.", 400);
 
   const supabase = createAdminClient();
+  let requestId: string;
   try {
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { count, error: countError } = await supabase
@@ -46,20 +50,36 @@ export async function POST(request: Request) {
       return fail("Bạn đã gửi nhiều yêu cầu hôm nay. Đội ngũ sẽ liên hệ với bạn sớm.", 429);
     }
 
-    const { error } = await supabase.from("quote_requests").insert({
-      customer_name: customerName,
-      email,
-      phone: phone || null,
-      country,
-      degree_level: degreeLevel,
-      service_package: pkg.id,
-      price_vnd: pkg.price,
-    });
+    const { data, error } = await supabase
+      .from("quote_requests")
+      .insert({
+        customer_name: customerName,
+        email,
+        phone: phone || null,
+        country,
+        degree_level: degreeLevel,
+        service_package: pkg.id,
+        price_vnd: pkg.price,
+      })
+      .select("id")
+      .single();
     if (error) throw error;
+    requestId = data.id;
   } catch (e) {
     console.error("Save quote request error", e);
     return fail("Chưa gửi được yêu cầu lúc này. Bạn thử lại sau nhé.", 500);
   }
+
+  // Gửi sang Make sau khi đã trả lời khách, để webhook chậm hay lỗi không ảnh hưởng khách.
+  after(() =>
+    sendQuoteToMake({
+      requestId,
+      customerName,
+      email,
+      servicePackage: pkg.name,
+      price: pkg.price,
+    }),
+  );
 
   return Response.json({ ok: true, price: pkg.price });
 }

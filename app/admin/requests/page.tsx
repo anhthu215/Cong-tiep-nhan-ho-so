@@ -1,5 +1,6 @@
 import { connection } from "next/server";
 import { AdminPageHeader } from "@/components/admin/page-header";
+import { ApproveButton } from "@/components/admin/approve-button";
 import { Card } from "@/components/ui/card";
 import { RequestStatusBadge } from "@/components/status-badge";
 import {
@@ -31,7 +32,7 @@ export default async function AdminRequestsPage() {
   await connection();
   const { data: requests, error } = await createAdminClient()
     .from("quote_requests")
-    .select("id, customer_name, email, phone, country, degree_level, service_package, price_vnd, status, created_at")
+    .select("id, customer_name, email, phone, country, degree_level, service_package, price_vnd, status, created_at, approval_notified_at")
     .order("created_at", { ascending: false });
   if (error) throw error;
 
@@ -54,6 +55,7 @@ export default async function AdminRequestsPage() {
               <TableHead>Giá</TableHead>
               <TableHead>Trạng thái</TableHead>
               <TableHead>Thời gian</TableHead>
+              <TableHead className="text-right">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -74,11 +76,24 @@ export default async function AdminRequestsPage() {
                 <TableCell className="whitespace-nowrap text-muted-foreground">
                   {new Date(req.created_at).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })}
                 </TableCell>
+                <TableCell>
+                  <div className="flex justify-end">
+                    {req.status === "cho_duyet" && (
+                      <ApproveButton id={req.id} customerName={req.customer_name} mode="approve" />
+                    )}
+                    {req.status === "da_duyet" &&
+                      (req.approval_notified_at ? (
+                        <span className="text-sm text-muted-foreground">Đã gửi thông báo</span>
+                      ) : (
+                        <ApproveButton id={req.id} customerName={req.customer_name} mode="resend" />
+                      ))}
+                  </div>
+                </TableCell>
               </TableRow>
             ))}
             {requests.length === 0 && (
               <TableRow>
-                <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
+                <TableCell colSpan={9} className="py-8 text-center text-muted-foreground">
                   Chưa có yêu cầu báo giá nào.
                 </TableCell>
               </TableRow>
