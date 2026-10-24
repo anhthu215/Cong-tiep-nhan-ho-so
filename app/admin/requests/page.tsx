@@ -1,6 +1,5 @@
-import { Check, X } from "lucide-react";
+import { connection } from "next/server";
 import { AdminPageHeader } from "@/components/admin/page-header";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { RequestStatusBadge } from "@/components/status-badge";
 import {
@@ -11,7 +10,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { admissionRequests, servicePackages } from "@/lib/mock-data";
+import { servicePackages, type RequestStatus } from "@/lib/mock-data";
+import { createAdminClient } from "@/lib/supabase/admin";
+
+const degreeLabels: Record<string, string> = {
+  thpt: "THPT",
+  dai_hoc: "Đại học",
+  thac_si: "Thạc sĩ",
+};
 
 function formatVnd(value: number) {
   return value.toLocaleString("vi-VN") + "₫";
@@ -21,7 +27,14 @@ function packageLabel(id: string) {
   return servicePackages.find((p) => p.id === id)?.name ?? id;
 }
 
-export default function AdminRequestsPage() {
+export default async function AdminRequestsPage() {
+  await connection();
+  const { data: requests, error } = await createAdminClient()
+    .from("quote_requests")
+    .select("id, customer_name, email, phone, country, degree_level, service_package, price_vnd, status, created_at")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+
   return (
     <>
       <AdminPageHeader
@@ -34,35 +47,42 @@ export default function AdminRequestsPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Tên khách</TableHead>
+              <TableHead>Liên hệ</TableHead>
+              <TableHead>Quốc gia</TableHead>
+              <TableHead>Bậc học</TableHead>
               <TableHead>Gói dịch vụ</TableHead>
-              <TableHead>Báo giá</TableHead>
+              <TableHead>Giá</TableHead>
               <TableHead>Trạng thái</TableHead>
               <TableHead>Thời gian</TableHead>
-              <TableHead className="text-right">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {admissionRequests.map((req) => (
+            {requests.map((req) => (
               <TableRow key={req.id}>
-                <TableCell className="font-medium">{req.customerName}</TableCell>
-                <TableCell>{packageLabel(req.package)}</TableCell>
-                <TableCell>{formatVnd(req.quote)}</TableCell>
+                <TableCell className="font-medium">{req.customer_name}</TableCell>
                 <TableCell>
-                  <RequestStatusBadge status={req.status} />
+                  <div>{req.email}</div>
+                  {req.phone && <div className="text-xs text-muted-foreground">{req.phone}</div>}
                 </TableCell>
-                <TableCell className="text-muted-foreground">{req.createdAt}</TableCell>
+                <TableCell>{req.country}</TableCell>
+                <TableCell>{degreeLabels[req.degree_level] ?? req.degree_level}</TableCell>
+                <TableCell>{packageLabel(req.service_package)}</TableCell>
+                <TableCell>{formatVnd(req.price_vnd)}</TableCell>
                 <TableCell>
-                  <div className="flex justify-end gap-2">
-                    <Button size="icon-sm" variant="outline" aria-label="Duyệt">
-                      <Check className="size-3.5" />
-                    </Button>
-                    <Button size="icon-sm" variant="outline" aria-label="Từ chối">
-                      <X className="size-3.5" />
-                    </Button>
-                  </div>
+                  <RequestStatusBadge status={req.status as RequestStatus} />
+                </TableCell>
+                <TableCell className="whitespace-nowrap text-muted-foreground">
+                  {new Date(req.created_at).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })}
                 </TableCell>
               </TableRow>
             ))}
+            {requests.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
+                  Chưa có yêu cầu báo giá nào.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </Card>

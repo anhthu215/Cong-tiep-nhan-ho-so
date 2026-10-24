@@ -43,15 +43,46 @@ export function QuoteForm() {
   const [country, setCountry] = React.useState<string>("");
   const [degreeLevel, setDegreeLevel] = React.useState<string>("dai_hoc");
   const [selectedPackage, setSelectedPackage] = React.useState<ServicePackage>("co_ban");
+  const [customerName, setCustomerName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [phone, setPhone] = React.useState("");
-  const [submitted, setSubmitted] = React.useState(false);
+  const [website, setWebsite] = React.useState(""); // ô ẩn chống bot
+  const [quotedPrice, setQuotedPrice] = React.useState<number | null>(null);
+  const [sending, setSending] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
   const chosenPackage = servicePackages.find((p) => p.id === selectedPackage)!;
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setSubmitted(true);
+    setError(null);
+    if (!country) {
+      setError("Vui lòng chọn quốc gia muốn du học.");
+      return;
+    }
+    setSending(true);
+    try {
+      const res = await fetch("/api/quotes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerName,
+          email,
+          phone,
+          country,
+          degreeLevel,
+          servicePackage: selectedPackage,
+          website,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? "Chưa gửi được yêu cầu.");
+      setQuotedPrice(typeof data.price === "number" ? data.price : chosenPackage.price);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Chưa gửi được yêu cầu.");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -152,6 +183,18 @@ export function QuoteForm() {
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2">
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="customerName">Họ và tên</Label>
+                <Input
+                  id="customerName"
+                  required
+                  minLength={2}
+                  autoComplete="name"
+                  placeholder="Nguyễn Văn A"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email liên hệ</Label>
                 <Input
@@ -176,20 +219,33 @@ export function QuoteForm() {
               </div>
             </div>
 
-            <Button type="submit" size="lg" className="w-full sm:w-auto">
+            <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+              <label htmlFor="website">Website</label>
+              <input
+                id="website"
+                tabIndex={-1}
+                autoComplete="off"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+              />
+            </div>
+
+            <Button type="submit" size="lg" className="w-full sm:w-auto" loading={sending}>
               Nhận báo giá
             </Button>
 
-            {submitted && (
+            {error && <p className="text-sm text-red-600">{error}</p>}
+
+            {quotedPrice !== null && (
               <div className="space-y-3 rounded-xl border border-primary/20 bg-accent p-5">
                 <p className="text-sm text-muted-foreground">Mức giá dự kiến cho bạn</p>
                 <p className="text-3xl font-semibold tracking-tight text-accent-foreground">
-                  {formatVnd(chosenPackage.price)}
+                  {formatVnd(quotedPrice)}
                 </p>
                 <div className="flex items-start gap-2 text-sm text-accent-foreground">
                   <Mail className="mt-0.5 size-4 shrink-0" />
                   <span>
-                    Báo giá đã được gửi qua email, đội ngũ sẽ liên hệ trong 24h.
+                    Chúng tôi đã nhận yêu cầu của bạn, đội ngũ sẽ liên hệ trong 24h.
                   </span>
                 </div>
               </div>
